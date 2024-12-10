@@ -1,7 +1,17 @@
-import { createContext, useContext, useState } from 'react';
+'use client'
 
-const UserContext = createContext({
-    user: null
+import { createContext, useState } from 'react';
+
+type TUserContext = {
+    user: null,
+    login: (value: any) => void,
+    logout: () => void,
+}
+
+export const UserContext = createContext<TUserContext>({
+    user: null,
+    login: function (value: any): void { },
+    logout: function (): void { }
 });
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
@@ -13,8 +23,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("userEmail", value)
     }
 
+    const logout = () => {
+        setUser(null)
+        localStorage.removeItem("userEmail")
+    }
+
     return (
-        <UserContext.Provider value={{ user }}>
+        <UserContext.Provider value={{ user, login, logout }}>
             {children}
         </UserContext.Provider>
     );
