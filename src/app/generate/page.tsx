@@ -4,7 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { contentType } from '@/utils/contentType';
-import { Clock, Instagram, Linkedin, Twitter, Zap } from 'lucide-react';
+import { generatedPromptPrefix } from '@/utils/prompts';
+import { GoogleGenerativeAI } from '@google/generative-ai'
+import ReactMarkdown from 'react-markdown'
+import { Clock, Instagram, Linkedin, Loader, Twitter } from 'lucide-react';
 
 import React, { useState } from 'react'
 
@@ -13,6 +16,29 @@ export default function GeneratePage() {
     const [prompt, setPrompt] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedContentType, setSelectedContentType] = useState<string>('')
+    const [generatedContent, setGeneratedContent] = useState<string>('');
+
+    const handleGenerate = async () => {
+        setLoading(true)
+        try {
+            const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
+
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+            const createdPrompt = generatedPromptPrefix(selectedContentType, prompt)
+            const result = await model.generateContent(createdPrompt);
+
+            setGeneratedContent(result.response.text())
+
+            console.log(result.response)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            setLoading(false)
+        }
+
+    }
+
 
 
     return (
@@ -98,7 +124,18 @@ export default function GeneratePage() {
                                     className="w-full bg-gray-700 border-none rounded-xl resize-none"
                                 />
                             </div>
-                            <Button className='w-full' disabled={!selectedContentType}>Generate Content</Button>
+                            <Button className='w-full' disabled={!selectedContentType || loading} onClick={handleGenerate}>
+                                Generate Content
+                                {loading ? <Loader className="animate-spin h-8 w-8 text-gray-500" /> : ''}</Button>
+                            {generatedContent ? <div >
+                                <h2 className='text-lg pb-3'>Generated Content:</h2>
+                                <div className='bg-gray-600 p-6 rounded-2xl space-y-6'>
+                                    <ReactMarkdown>
+                                        {generatedContent}
+                                    </ReactMarkdown>
+                                </div>
+
+                            </div> : ''}
                         </div>
                     </div>
                 </div>

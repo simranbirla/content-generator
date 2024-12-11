@@ -9,16 +9,9 @@ type TUserContext = {
     logout: () => void,
 }
 
-
-type TLoginValues = {
-    displayPictureUrl: string,
-    email: string,
-    name: string
-}
-
 export const UserContext = createContext<TUserContext>({
     user: null,
-    login: function (value: TLoginValues): void { },
+    login: function (value: TUser): void { },
     logout: function (): void { }
 });
 
@@ -26,14 +19,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<any>(null);
 
 
-    const login = (value: TLoginValues) => {
+    const login = (value: TUser) => {
         setUser(value)
         localStorage.setItem("userEmail", value.email)
+        localStorage.setItem("userId", value.id as string)
     }
 
     const logout = () => {
         setUser(null)
         localStorage.removeItem("userEmail")
+        localStorage.removeItem("userId")
     }
 
     return (

@@ -30,6 +30,7 @@ export default function Header() {
             displayPictureUrl: newUser.displayPictureUrl,
             name: newUser.name,
             email: newUser.email,
+            id: newUser.id
         })
     }
 
