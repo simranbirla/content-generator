@@ -10,6 +10,7 @@ import { signInWithPopup, signOut } from 'firebase/auth';
 import { auth, provider } from '@/firebase'
 import { DropdownMenu, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { getUser } from '@/db/actions';
 
 export default function Header() {
 
@@ -17,10 +18,18 @@ export default function Header() {
 
     const signIn = async () => {
         const result = await signInWithPopup(auth, provider)
+        const newUser = await getUser({
+            displayPictureUrl: result.user.photoURL as string,
+            name: result.user.displayName as string,
+            email: result.user.email as string,
+        });
+
+        console.log(newUser)
+
         login({
-            displayPictureUrl: result.user.photoURL,
-            name: result.user.displayName,
-            email: result.user.email,
+            displayPictureUrl: newUser.displayPictureUrl,
+            name: newUser.name,
+            email: newUser.email,
         })
     }
 

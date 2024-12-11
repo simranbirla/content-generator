@@ -1,5 +1,6 @@
 'use client'
 
+import { TUser } from '@/types/user';
 import { createContext, useState } from 'react';
 
 type TUserContext = {
@@ -8,12 +9,6 @@ type TUserContext = {
     logout: () => void,
 }
 
-type TUser = {
-    name: string,
-    email: string,
-    displayPictureUrl: string,
-    id?: string,
-}
 
 type TLoginValues = {
     displayPictureUrl: string,
