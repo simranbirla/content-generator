@@ -7,7 +7,7 @@ import { contentType } from '@/utils/contentType';
 import { generatedPromptPrefix } from '@/utils/prompts';
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import ReactMarkdown from 'react-markdown'
-import { Clock, Instagram, Linkedin, Loader, Twitter, Upload } from 'lucide-react';
+import { Check, Clipboard, Clock, Instagram, Linkedin, Loader, Twitter, Upload } from 'lucide-react';
 
 import React, { useContext, useEffect, useState } from 'react'
 import { createPosts, getPostsByUserId } from '@/db/actions';
@@ -21,6 +21,7 @@ export default function GeneratePage() {
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedContentType, setSelectedContentType] = useState<string>('')
     const [generatedContent, setGeneratedContent] = useState<string>('');
+    const [isCopy, setIsCopy] = useState<boolean>(false);
 
     useEffect(() => {
         const getUsersHistory = async (userId: number) => {
@@ -62,6 +63,16 @@ export default function GeneratePage() {
             setLoading(false)
         }
 
+    }
+
+
+    const handleCopyToClipboard = () => {
+        setIsCopy(true)
+        navigator.clipboard.writeText(generatedContent);
+
+        setTimeout(() => {
+            setIsCopy(false)
+        }, 1000)
     }
 
 
@@ -175,7 +186,8 @@ export default function GeneratePage() {
                                 {loading ? <Loader className="animate-spin h-8 w-8 text-gray-500" /> : ''}</Button>
                             {generatedContent ? <div >
                                 <h2 className='text-lg pb-3'>Generated Content:</h2>
-                                <div className='bg-gray-600 p-6 rounded-2xl space-y-6'>
+                                <div className='bg-gray-600 p-6 rounded-2xl space-y-6 text-ellipsis flex flex-col gap-3'>
+                                    <Button onClick={handleCopyToClipboard} className={`gap-1 text-sm cursor-pointer w-auto self-end ${isCopy ? 'border-solid border-2 border-white' : ''}`} variant={'ghost'}>{!isCopy ? 'Copy to Clipboard' : 'Copied!'} {!isCopy ? <Clipboard className='h-4 w-4' /> : <Check className='h-4 w-4' />}</Button>
                                     <ReactMarkdown>
                                         {generatedContent}
                                     </ReactMarkdown>
