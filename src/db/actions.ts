@@ -26,7 +26,7 @@ export const getUser = async (user: TUser) => {
     }
 }
 
-export const createPosts = async (post: TPost) => {
+export const createPosts = async (post: Omit<TPost, 'createdAt'>) => {
 
     try {
         const [newPost] = await db.insert(Posts).values({

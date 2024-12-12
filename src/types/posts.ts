@@ -3,6 +3,7 @@ export type TPost = {
     userId: number,
     displayPictureUrl?: string,
     id?: number,
+    createdAt: Date,
     contentType: ContentType
 }
 

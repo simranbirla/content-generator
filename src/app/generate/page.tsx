@@ -76,9 +76,9 @@ export default function GeneratePage() {
                             <Clock className="h-6 w-6 text-blue-400" />
                         </div>
                         <div className="space-y-4">
-                            {history.map((item: any) => (
+                            {history.map((item) => (
                                 <div
-                                    key={item}
+                                    key={item.id}
                                     className="p-4 bg-gray-700 rounded-xl hover:bg-gray-600 transition-colors cursor-pointer"
                                 >
                                     <div className="flex items-center mb-2">
@@ -96,7 +96,7 @@ export default function GeneratePage() {
                                         </span>
                                     </div>
                                     <p className="text-sm text-gray-300 truncate">
-                                        {item.prompt}
+                                        {item.text}
                                     </p>
                                     <div className="flex items-center text-xs text-gray-400 mt-2">
                                         <Clock className="mr-1 h-3 w-3" />
