@@ -17,21 +17,29 @@ export default function Header() {
     const { user, login, logout } = useContext(UserContext);
 
     const signIn = async () => {
-        const result = await signInWithPopup(auth, provider)
-        const newUser = await getUser({
-            displayPictureUrl: result.user.photoURL as string,
-            name: result.user.displayName as string,
-            email: result.user.email as string,
-        });
+        try {
+            const result = await signInWithPopup(auth, provider)
+            const newUser = await getUser({
+                displayPictureUrl: result.user.photoURL as string,
+                name: result.user.displayName as string,
+                email: result.user.email as string,
+            });
 
-        console.log(newUser)
+            if (newUser) {
+                login({
+                    displayPictureUrl: newUser.displayPictureUrl,
+                    name: newUser.name,
+                    email: newUser.email,
+                    id: newUser.id
+                })
+            } else {
+                throw new Error('Error logging new user')
+            }
+        } catch (e) {
+            console.log(e)
+        }
 
-        login({
-            displayPictureUrl: newUser.displayPictureUrl,
-            name: newUser.name,
-            email: newUser.email,
-            id: newUser.id
-        })
+
     }
 
     const loggingOut = async () => {

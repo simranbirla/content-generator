@@ -22,7 +22,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const login = (value: TUser) => {
         setUser(value)
         localStorage.setItem("userEmail", value.email)
-        localStorage.setItem("userId", value.id as string)
+        localStorage.setItem("userId", value.id?.toString() as string)
     }
 
     const logout = () => {

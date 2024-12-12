@@ -7,16 +7,36 @@ import { contentType } from '@/utils/contentType';
 import { generatedPromptPrefix } from '@/utils/prompts';
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import ReactMarkdown from 'react-markdown'
-import { Clock, Instagram, Linkedin, Loader, Twitter } from 'lucide-react';
+import { Clock, Instagram, Linkedin, Loader, Twitter, Upload } from 'lucide-react';
 
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { createPosts, getPostsByUserId } from '@/db/actions';
+import { UserContext } from '@/context/UserContext';
+import { ContentType, TPost } from '@/types/posts';
 
 export default function GeneratePage() {
-    const [history, setHistory] = useState([])
+    const { user } = useContext(UserContext);
+    const [history, setHistory] = useState<TPost[]>([])
     const [prompt, setPrompt] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedContentType, setSelectedContentType] = useState<string>('')
     const [generatedContent, setGeneratedContent] = useState<string>('');
+
+    useEffect(() => {
+        const getUsersHistory = async (userId: number) => {
+            try {
+                const posts = await getPostsByUserId(userId);
+
+                setHistory(posts as TPost[])
+            } catch (e) {
+                console.log("Error getting posts", e)
+            }
+        }
+
+        if (user && user.id) {
+            getUsersHistory(user.id)
+        }
+    }, [user])
 
     const handleGenerate = async () => {
         setLoading(true)
@@ -27,10 +47,15 @@ export default function GeneratePage() {
 
             const createdPrompt = generatedPromptPrefix(selectedContentType, prompt)
             const result = await model.generateContent(createdPrompt);
+            const resultTexts = result.response.text()
+            setGeneratedContent(resultTexts)
 
-            setGeneratedContent(result.response.text())
+            await createPosts({
+                text: resultTexts,
+                userId: user?.id as number,
+                contentType: selectedContentType.toLocaleLowerCase() as ContentType
+            })
 
-            console.log(result.response)
         } catch (e) {
             console.log(e)
         } finally {
@@ -107,6 +132,27 @@ export default function GeneratePage() {
                                     </SelectContent>
                                 </Select>
                             </div>
+
+                            {selectedContentType === 'instagram' && <div className="mb-4">
+                                <label htmlFor="verification-image" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Upload Image
+                                </label>
+                                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                    <div className="space-y-1 text-center">
+                                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                        <div className="flex text-sm text-gray-600">
+                                            <label
+                                                htmlFor="verification-image"
+                                                className="relative cursor-pointer text-center rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                                            >
+                                                <span className='text-center mx-auto'>Upload a file</span>
+                                                <input id="verification-image" name="verification-image" type="file" className="sr-only" accept="image/*" />
+                                            </label>
+                                        </div>
+                                        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                    </div>
+                                </div>
+                            </div>}
 
                             <div>
                                 <label

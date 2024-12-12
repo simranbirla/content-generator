@@ -14,4 +14,5 @@ export const Posts = pgTable("posts", {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   userId: integer('user_id').references(() => Users.id).notNull(),
   displayPictureUrl: text(),
+  contentType: varchar({ enum: ["linkedin", "twitter", "instagram"] })
 })
