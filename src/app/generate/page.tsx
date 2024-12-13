@@ -160,7 +160,6 @@ export default function GeneratePage() {
                                                 <input id="verification-image" name="verification-image" type="file" className="sr-only" accept="image/*" />
                                             </label>
                                         </div>
-                                        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
                                     </div>
                                 </div>
                             </div>}
