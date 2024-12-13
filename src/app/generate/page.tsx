@@ -22,6 +22,7 @@ export default function GeneratePage() {
     const [selectedContentType, setSelectedContentType] = useState<string>('')
     const [generatedContent, setGeneratedContent] = useState<string>('');
     const [isCopy, setIsCopy] = useState<boolean>(false);
+    const [image, setImage] = useState<string>('')
 
     useEffect(() => {
         const getUsersHistory = async (userId: number) => {
@@ -46,16 +47,45 @@ export default function GeneratePage() {
 
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-            const createdPrompt = generatedPromptPrefix(selectedContentType, prompt)
-            const result = await model.generateContent(createdPrompt);
-            const resultTexts = result.response.text()
-            setGeneratedContent(resultTexts)
 
-            await createPosts({
-                text: resultTexts,
-                userId: user?.id as number,
-                contentType: selectedContentType.toLocaleLowerCase() as ContentType
-            })
+            if (selectedContentType === ContentType.INSTAGRAM) {
+                const base64Data = readFileAsBase64(image)
+
+                const imageParts = [
+                    {
+                        inlineData: {
+                            data: base64Data,
+                            mimeType: 'image/jpeg',
+                        },
+                    },
+                ]
+
+                const createdPrompt = generatedPromptPrefix(selectedContentType, prompt)
+                const result = await model.generateContent([createdPrompt, ...imageParts])
+
+                const resultTexts = result.response.text()
+                setGeneratedContent(resultTexts)
+
+                await createPosts({
+                    text: resultTexts,
+                    userId: user?.id as number,
+                    contentType: selectedContentType.toLocaleLowerCase() as ContentType
+                })
+
+            } else {
+
+                const createdPrompt = generatedPromptPrefix(selectedContentType, prompt)
+                const result = await model.generateContent(createdPrompt);
+                const resultTexts = result.response.text()
+                setGeneratedContent(resultTexts)
+
+                await createPosts({
+                    text: resultTexts,
+                    userId: user?.id as number,
+                    contentType: selectedContentType.toLocaleLowerCase() as ContentType
+                })
+            }
+
 
         } catch (e) {
             console.log(e)
@@ -63,6 +93,22 @@ export default function GeneratePage() {
             setLoading(false)
         }
 
+    }
+
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setImage(reader.result as string)
+            }
+            reader.readAsDataURL(file)
+        }
+    }
+
+    const readFileAsBase64 = (dataUrl: string): string => {
+        return dataUrl.split(',')[1]
     }
 
 
@@ -157,7 +203,7 @@ export default function GeneratePage() {
                                                 className="relative cursor-pointer text-center rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
                                             >
                                                 <span className='text-center mx-auto'>Upload a file</span>
-                                                <input id="verification-image" name="verification-image" type="file" className="sr-only" accept="image/*" />
+                                                <input id="verification-image" name="verification-image" type="file" className="sr-only" accept="image/*" onChange={handleImageUpload} />
                                             </label>
                                         </div>
                                     </div>
