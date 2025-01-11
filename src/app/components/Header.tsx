@@ -57,7 +57,7 @@ export default function Header() {
             </Link>
             <nav className='flex gap-10 items-center'>
                 <Link href={'/generate'}>Generate</Link>
-                <Link href={'/github'}>Github</Link>
+                <Link href={'https://github.com/simranbirla/content-generator'}>Github</Link>
                 {user ?
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
