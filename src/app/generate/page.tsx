@@ -123,6 +123,15 @@ export default function GeneratePage() {
 
 
 
+    const isButtonDisabled = () => {
+        if (!selectedContentType || loading) return true;
+
+        if (selectedContentType === ContentType.INSTAGRAM && !image) return true
+
+        return false
+    }
+
+
     return (
         <div className="bg-gradient-to-br from-gray-900 to-black min-h-screen text-white">
             <div className="container mx-auto px-4 mb-8 sm:px-6 lg:px-8 py-8">
@@ -210,6 +219,10 @@ export default function GeneratePage() {
                                 </div>
                             </div>}
 
+                            {image && (
+                                <img src={image} alt="Verification" className="mb-4 rounded-md w-full" />
+                            )}
+
                             <div>
                                 <label
                                     htmlFor="prompt"
@@ -226,7 +239,7 @@ export default function GeneratePage() {
                                     className="w-full bg-gray-700 border-none rounded-xl resize-none"
                                 />
                             </div>
-                            <Button className='w-full' disabled={!selectedContentType || loading} onClick={handleGenerate}>
+                            <Button className='w-full' disabled={isButtonDisabled()} onClick={handleGenerate}>
                                 Generate Content
                                 {loading ? <Loader className="animate-spin h-8 w-8 text-gray-500" /> : ''}</Button>
                             {generatedContent ? <div >
