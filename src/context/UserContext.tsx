@@ -5,18 +5,18 @@ import { createContext, useState } from 'react';
 
 type TUserContext = {
     user: null | TUser,
-    login: (value: any) => void,
+    login: (value: TUser) => void,
     logout: () => void,
 }
 
 export const UserContext = createContext<TUserContext>({
     user: null,
-    login: function (value: TUser): void { },
+    login: function (): void { },
     logout: function (): void { }
 });
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<TUser | null>(null);
 
 
     const login = (value: TUser) => {

@@ -27,7 +27,7 @@ export default function Header() {
 
             if (newUser) {
                 login({
-                    displayPictureUrl: newUser.displayPictureUrl,
+                    displayPictureUrl: newUser.displayPictureUrl as string,
                     name: newUser.name,
                     email: newUser.email,
                     id: newUser.id
