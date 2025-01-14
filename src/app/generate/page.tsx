@@ -13,6 +13,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { createPosts, getPostsByUserId } from '@/db/actions';
 import { UserContext } from '@/context/UserContext';
 import { ContentType, TPost } from '@/types/posts';
+import { redirect } from 'next/navigation';
 
 export default function GeneratePage() {
     const { user } = useContext(UserContext);
@@ -37,6 +38,12 @@ export default function GeneratePage() {
 
         if (user && user.id) {
             getUsersHistory(user.id)
+        }
+    }, [user])
+
+    useEffect(() => {
+        if (!user) {
+            redirect('/')
         }
     }, [user])
 
